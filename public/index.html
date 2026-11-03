@@ -323,8 +323,26 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 };
-const today = new Date(); today.setHours(0, 0, 0, 0);
-const dayNo = Math.max(0, Math.round((today - LAUNCH) / 86400000));
+// A new case is released every day at 07:00 Romania time, the same moment for every player.
+const RELEASE_TZ = 'Europe/Bucharest', RELEASE_HOUR = 7;
+function tzParts(d) {
+  const p = {};
+  for (const x of new Intl.DateTimeFormat('en-US', { timeZone: RELEASE_TZ, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23' }).formatToParts(d)) p[x.type] = +x.value;
+  return p;
+}
+function caseDayNo(d) {
+  const p = tzParts(d);
+  let day = Date.UTC(p.year, p.month - 1, p.day);
+  if (p.hour < RELEASE_HOUR) day -= 86400000;
+  return Math.round((day - Date.UTC(2026, 9, 28)) / 86400000);
+}
+function secsToRelease(d) {
+  const p = tzParts(d);
+  let s = RELEASE_HOUR * 3600 - (p.hour * 3600 + p.minute * 60 + p.second);
+  if (s <= 0) s += 86400;
+  return s;
+}
+const dayNo = Math.max(0, caseDayNo(new Date()));
 const MAX = 5;
 
 let S;
@@ -575,14 +593,15 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
 $('helpBtn').onclick = () => openOv('helpOv');
 $('targetBtn').onclick = () => { renderMini($('bigTarget'), S.target, true); openOv('targetOv'); };
 function tick() {
-  const now = new Date(), next = new Date(now); next.setHours(24, 0, 0, 0);
-  const s = Math.max(0, Math.floor((next - now) / 1000));
+  const now = new Date();
+  if (caseDayNo(now) + 1 > TODAY) { location.reload(); return; }
+  const s = secsToRelease(now);
   const pad = n => String(n).padStart(2, '0');
   $('nextCase').textContent = `Next case in ${pad(Math.floor(s / 3600))}:${pad(Math.floor(s % 3600 / 60))}:${pad(s % 60)}`;
 }
 S = newState(TODAY); render(); tick(); setInterval(tick, 1000);
 if (S.status !== 'playing') submitResult();
-if (S.status !== 'playing') msg(S.status === 'won' ? '<b>Case closed.</b> Come back tomorrow, or play the archive.' : 'Today\'s case is over. A new one arrives at midnight.');
+if (S.status !== 'playing') msg(S.status === 'won' ? '<b>Case closed.</b> Come back tomorrow, or play the archive.' : 'Today\'s case is over. A new one arrives tomorrow.');
 openOv('helpOv');
 </script>
 
