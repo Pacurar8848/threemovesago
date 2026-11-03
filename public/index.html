@@ -258,7 +258,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
 <script>
 // Cases are served by /api (only released cases, without solutions).
 let CASE_META = {};
-const LAUNCH = new Date(2026, 9, 28);   // case #1 = 28 Oct 2026, so 3 Nov 2026 = case #7
+const LAUNCH = new Date(2026, 9, 21);   // case #1 = 21 Oct 2026, so 3 Nov 2026 = case #14
 const ARCHIVE_PAYWALL = false;   // set to true when the archive becomes paid
 const FREE_RECENT = 7;           // with the paywall on, the last 7 cases stay free
 const START = 'RNBQKBNRPPPPPPPP' + '.'.repeat(32) + 'pppppppprnbqkbnr';
@@ -363,7 +363,7 @@ function caseDayNo(d) {
   const p = tzParts(d);
   let day = Date.UTC(p.year, p.month - 1, p.day);
   if (p.hour < RELEASE_HOUR) day -= 86400000;
-  return Math.round((day - Date.UTC(2026, 9, 28)) / 86400000);
+  return Math.round((day - Date.UTC(2026, 9, 21)) / 86400000);
 }
 function secsToRelease(d) {
   const p = tzParts(d);

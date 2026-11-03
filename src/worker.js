@@ -6,7 +6,7 @@ import CASES from './cases.js';
 
 const MAX_ATTEMPTS = 5;
 const RELEASE_TZ = 'Europe/Bucharest', RELEASE_HOUR = 7;   // new case every day at 07:00 Romania time
-const LAUNCH_UTC = Date.UTC(2026, 9, 28);                  // case #1
+const LAUNCH_UTC = Date.UTC(2026, 9, 21);                  // case #1
 
 function tzParts(d) {
   const p = {};

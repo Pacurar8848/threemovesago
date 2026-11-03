@@ -1,4 +1,4 @@
-// Daily cases. Index 0 = case #1 (28 Oct 2026). Cases already released must never change order.
+// Daily cases. Index 0 = case #1 (21 Oct 2026). Cases already released must never change order.
 // This file is server-side only; the browser only ever receives cases up to today, without solutions.
 export default [
 {"fen": "rnbqkb1r/pppppp1p/8/6p1/3P4/8/PPP1PPPP/RNBQKBNR", "uci": ["d2d4", "g8h6", "c1h6", "g7g6", "h6c1", "g6g5"], "san": ["d4", "Nh6", "Bxh6", "g6", "Bc1", "g5"], "level": "Normal"},
