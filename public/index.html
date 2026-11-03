@@ -530,30 +530,31 @@ const SND = (() => {
       return ctx;
     } catch (e) { return null; }
   }
-  function knock(c, t, vol, band, low) {
-    const src = c.createBufferSource(); src.buffer = noise;
-    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = band; bp.Q.value = 1.4;
-    const g = c.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
-    src.connect(bp).connect(g).connect(c.destination); src.start(t); src.stop(t + 0.12);
-    const o = c.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(low, t); o.frequency.exponentialRampToValueAtTime(low / 2, t + 0.08);
-    const og = c.createGain(); og.gain.setValueAtTime(vol * 0.7, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-    o.connect(og).connect(c.destination); o.start(t); o.stop(t + 0.12);
+  // Short wooden clicks: a bright attack + a damped "body" resonance. No pitched thump.
+  function click(c, t, vol, body, decay) {
+    const n1 = c.createBufferSource(); n1.buffer = noise;
+    const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3200;
+    const g1 = c.createGain(); g1.gain.setValueAtTime(vol * 0.5, t); g1.gain.exponentialRampToValueAtTime(0.0001, t + 0.012);
+    n1.connect(hp).connect(g1).connect(c.destination); n1.start(t); n1.stop(t + 0.03);
+    const n2 = c.createBufferSource(); n2.buffer = noise;
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = body; bp.Q.value = 4;
+    const g2 = c.createGain(); g2.gain.setValueAtTime(vol, t); g2.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+    n2.connect(bp).connect(g2).connect(c.destination); n2.start(t); n2.stop(t + decay + 0.02);
   }
-  function tone(c, t, f, dur, vol, type = 'triangle', f2) {
-    const o = c.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
-    const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  function tone(c, t, f, dur, vol) {
+    const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+    const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + 0.02);
   }
   function play(kind) {
     const c = ac(); if (!c) return; const t = c.currentTime + 0.005;
-    if (kind === 'move') knock(c, t, 0.55, 1700, 190);
-    else if (kind === 'capture') { knock(c, t, 0.7, 1300, 160); knock(c, t + 0.05, 0.5, 2100, 220); }
-    else if (kind === 'check') { knock(c, t, 0.6, 1700, 190); tone(c, t + 0.04, 880, 0.18, 0.08, 'sine'); }
-    else if (kind === 'select') knock(c, t, 0.12, 2600, 300);
-    else if (kind === 'undo') knock(c, t, 0.3, 1200, 140);
-    else if (kind === 'bad') { tone(c, t, 330, 0.16, 0.09); tone(c, t + 0.13, 247, 0.24, 0.09); }
-    else if (kind === 'win') [523, 659, 784, 1047].forEach((f, k) => tone(c, t + k * 0.09, f, k === 3 ? 0.45 : 0.18, 0.1));
-    else if (kind === 'lose') { tone(c, t, 294, 0.22, 0.1); tone(c, t + 0.18, 262, 0.22, 0.1); tone(c, t + 0.36, 196, 0.5, 0.1); }
+    if (kind === 'move') click(c, t, 0.32, 950, 0.05);
+    else if (kind === 'capture') { click(c, t, 0.38, 1250, 0.045); click(c, t + 0.022, 0.22, 800, 0.05); }
+    else if (kind === 'check') { click(c, t, 0.34, 1100, 0.05); tone(c, t + 0.02, 1320, 0.12, 0.018); }
+    else if (kind === 'undo') click(c, t, 0.18, 800, 0.04);
+    else if (kind === 'bad') click(c, t, 0.22, 380, 0.09);
+    else if (kind === 'win') { tone(c, t, 784, 0.5, 0.06); tone(c, t + 0.1, 1175, 0.7, 0.05); }
+    else if (kind === 'lose') { tone(c, t, 392, 0.45, 0.05); tone(c, t + 0.14, 294, 0.6, 0.05); }
   }
   return { play, get on() { return on; }, set(v) { on = v; store.set('tma:sound', v); } };
 })();
@@ -569,7 +570,7 @@ function onSquare(i) {
     const m = legalMoves(S.board, w).find(m => m[0] === S.sel && m[1] === i);
     if (m) { play(m, w); return; }
   }
-  if (p !== '.' && isW(p) === w) { S.sel = S.sel === i ? null : i; if (S.sel != null) SND.play('select'); }
+  if (p !== '.' && isW(p) === w) { S.sel = S.sel === i ? null : i; }
   else { S.sel = null; if (p !== '.') msg(`It is ${w ? 'White' : 'Black'}'s turn.`); }
   renderBoard();
 }
