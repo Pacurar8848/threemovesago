@@ -6,7 +6,10 @@
 <meta name="description" content="A daily chess detective puzzle. See the position, work out the three moves that led there.">
 <meta property="og:title" content="Three Moves Ago">
 <meta property="og:description" content="A daily chess detective puzzle. Work out the three moves that led to today's position.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232d6a4f'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='white' font-family='Georgia,serif' font-style='italic' font-weight='700'%3E3%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:image" content="https://threemovesago.pacurartudorx.workers.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <title>Three Moves Ago</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@1,6..72,600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
@@ -43,6 +46,12 @@ header{border-bottom:1px solid var(--line)}
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px}
 .logo{display:flex;align-items:center;gap:7px;min-width:0;font-family:var(--font-display);font-style:italic;font-weight:600;font-size:21px;letter-spacing:-.3px;white-space:nowrap}
 .logo .ago{color:var(--accent)}
+.mark{width:30px;height:30px;flex:0 0 auto;display:block}
+.mark.big{width:44px;height:44px}
+.help-brand{display:flex;align-items:center;gap:12px}
+@media (max-width:420px){.logo .mark{width:26px;height:26px}}
+@media (max-width:400px){header .logo{font-size:18px;gap:6px}header .logo .mark{width:24px;height:24px}header .tools .icon-btn{width:34px}header .tools .streak{border:0;padding:0 4px;margin-right:0;gap:3px}}
+@media (max-width:340px){header .logo{font-size:15px;gap:5px}header .logo .mark{width:22px;height:22px}header .tools .icon-btn{width:32px}}
 @media (max-width:420px){.logo{font-size:19px}.tools{gap:0}.tools .icon-btn{width:38px}.streak{padding:0 8px;margin-right:2px}}
 header .wrap{gap:8px}
 .tools{display:flex;align-items:center;gap:2px}
@@ -137,6 +146,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
 <header>
   <div class="wrap">
     <div class="logo">
+      <svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="var(--accent)"/><g transform="translate(50,18) scale(.46)" fill="var(--on-accent)"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(27,27) scale(.4)" fill="var(--on-accent)" opacity=".55"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(6,35) scale(.35)" fill="var(--on-accent)" opacity=".28"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g></svg>
       <span>Three Moves <span class="ago">Ago</span></span>
     </div>
     <div class="tools">
@@ -199,7 +209,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
 
 <div class="overlay" id="helpOv" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
-    <div class="sheet-top"><h2 id="helpTitle">How to play</h2><button class="icon-btn" data-close aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="sheet-top"><div class="help-brand"><svg class="mark big" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="var(--accent)"/><g transform="translate(50,18) scale(.46)" fill="var(--on-accent)"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(27,27) scale(.4)" fill="var(--on-accent)" opacity=".55"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(6,35) scale(.35)" fill="var(--on-accent)" opacity=".28"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g></svg><h2 id="helpTitle">How to play</h2></div><button class="icon-btn" data-close aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <p>You get a target position. Find the moves that led there: <b>3 moves by White and 3 by Black</b>, played from the position on the board. You have 5 attempts.</p>
     <p>Some cases start from the opening position. <b>Midgame cases</b> start from a position after a real opening, with White to move.</p>
     <p class="foot">Opening cases are Normal, midgame cases are Extreme. A missing piece means it was captured. Moves don't have to be good — they just have to lead to this exact position. Expect pieces that move and come back, captures that leave no trace, and checks that force the order.</p>
