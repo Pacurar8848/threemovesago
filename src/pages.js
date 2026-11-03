@@ -82,6 +82,7 @@ export function casePage(n, c, today, launchUtc) {
 <div class="boards">${mid ? `<figure>${board(start, 'Start position')}<figcaption>Start</figcaption></figure>` : ''}<figure>${board(c.fen, 'Target position')}<figcaption>Target</figcaption></figure></div>
 <div class="card"><b>Clues on the board</b><br>White has lost: ${missing(start, c.fen, true)}.<br>Black has lost: ${missing(start, c.fen, false)}.<br>Every missing piece was captured during these six moves.</div>
 <div class="cta"><a class="play" href="/?case=${n}">Play Case #${n}</a></div>
+<p style="text-align:center;font-size:15px;color:var(--muted)">New to retro chess? Read the <a href="/learn/retrograde-analysis">retrograde analysis guide</a>.</p>
 <div class="pager">${n > 1 ? `<a href="/case/${n - 1}">← Case #${n - 1}</a>` : '<span></span>'}${n < today ? `<a href="/case/${n + 1}">Case #${n + 1} →</a>` : '<a href="/cases">All cases</a>'}</div>`;
   const jsonld = { '@context': 'https://schema.org', '@type': 'WebPage', name: `Case #${n} · ${level}`, description: desc, url: `${BASE}/case/${n}`, datePublished: isoDate(n, launchUtc), isPartOf: { '@type': 'WebSite', name: 'Three Moves Ago', url: BASE + '/' } };
   return html(layout({ title, desc, path: `/case/${n}`, body, jsonld }), 200, n === today ? 300 : 3600);
@@ -98,7 +99,7 @@ export function listPage(today, caseAt, launchUtc) {
 
 export function sitemap(today, launchUtc) {
   const urls = [['/', 'daily', '1.0'], ['/learn/', 'monthly', '0.8'], ['/learn/retrograde-analysis', 'monthly', '0.8'], ['/learn/proof-games', 'monthly', '0.8'],
-    ['/learn/how-to-solve', 'monthly', '0.8'], ['/about', 'monthly', '0.6'], ['/cases', 'daily', '0.6'], ['/privacy', 'yearly', '0.2']];
+    ['/learn/how-to-solve', 'monthly', '0.8'], ['/ro/analiza-retrograda', 'monthly', '0.6'], ['/about', 'monthly', '0.6'], ['/cases', 'daily', '0.6'], ['/privacy', 'yearly', '0.2']];
   for (let n = today; n >= 1; n--) urls.push([`/case/${n}`, n === today ? 'daily' : 'yearly', '0.5', isoDate(n, launchUtc)]);
   const body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     urls.map(([p, f, pr, lm]) => `  <url><loc>${BASE}${p}</loc>${lm ? `<lastmod>${lm}</lastmod>` : ''}<changefreq>${f}</changefreq><priority>${pr}</priority></url>`).join('\n') + '\n</urlset>\n';
