@@ -221,7 +221,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
     <textarea class="share-fallback" id="shareText" readonly hidden aria-label="Result to copy"></textarea>
     <div class="foot" id="nextCase">Next case in --:--:--</div>
   </section>
-  <p class="foot site-foot"><a href="/about">FAQ · What is retrograde analysis?</a> · <a href="/privacy">Privacy</a></p>
+  <p class="foot site-foot"><a href="/about">FAQ</a> · <a href="/learn/">What is retrograde analysis?</a> · <a href="/cases">All cases</a> · <a href="/privacy">Privacy</a></p>
 </main>
 
 <div class="overlay" id="helpOv" hidden>
@@ -665,7 +665,7 @@ $('hintBtn').onclick = async () => {
 };
 $('shareBtn').onclick = async () => {
   const icon = { g: '\u{1F7E9}', y: '\u{1F7E8}', x: '⬜' };
-  const text = `Three Moves Ago #${S.caseNo} ${S.status === 'won' ? S.attempts.length : 'X'}/${MAX}${S.hint !== null ? ' (1 hint)' : ''}\n` + S.attempts.map(a => a.marks.map(m => icon[m]).join('')).join('\n');
+  const text = `Three Moves Ago #${S.caseNo} ${S.status === 'won' ? S.attempts.length : 'X'}/${MAX}${S.hint !== null ? ' (1 hint)' : ''}\n` + S.attempts.map(a => a.marks.map(m => icon[m]).join('')).join('\n') + '\nthreemovesago.com';
   const ta = $('shareText');
   try { await navigator.clipboard.writeText(text); $('shareBtn').textContent = 'Copied'; setTimeout(() => $('shareBtn').textContent = 'Share result', 1800); }
   catch (e) { ta.hidden = false; ta.value = text; ta.focus(); ta.select(); $('shareBtn').textContent = 'Copy the text below'; }
@@ -734,6 +734,9 @@ CASE_META = store.get('tma:meta', {});
     catch (e2) { msg('Could not load today’s case. Check your connection and refresh the page.'); return; }
   }
   S = newState(TODAY, c); render(); tick(); setInterval(tick, 1000);
+  // Links like /?case=12 (from the case pages) open that case directly.
+  const want = +new URLSearchParams(location.search).get('case');
+  if (Number.isInteger(want) && want >= 1 && want < TODAY && !isLocked(want)) { openCase(want); return; }
   if (S.status !== 'playing') { submitResult(); ensureSolution(S); }
   if (S.status !== 'playing') msg(S.status === 'won' ? '<b>Case closed.</b> Come back tomorrow, or play the archive.' : 'Today\'s case is over. A new one arrives tomorrow.');
 })();

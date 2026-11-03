@@ -3,6 +3,7 @@
 // The browser never receives a solution before the case is finished, and never receives future cases.
 import { START, legalMoves, fenToBoard } from './engine.js';
 import CASES from './cases.js';
+import { casePage, listPage, sitemap, notFound } from './pages.js';
 
 const MAX_ATTEMPTS = 5;
 const RELEASE_TZ = 'Europe/Bucharest', RELEASE_HOUR = 7;   // new case every day at 07:00 Romania time
@@ -122,7 +123,18 @@ export default {
       try { return await handleApi(request, url); }
       catch (e) { return bad('Server error.', 500); }
     }
-    return env.ASSETS.fetch(request);
+    if (request.method === 'GET') {
+      const p = url.pathname;
+      if (p === '/sitemap.xml') return sitemap(todayNo(), LAUNCH_UTC);
+      if (p === '/cases' || p === '/cases/') return listPage(todayNo(), caseAt, LAUNCH_UTC);
+      const m = p.match(/^\/case\/(\d{1,5})\/?$/);
+      if (m) {
+        const n = +m[1], today = todayNo();
+        return n >= 1 && n <= today ? casePage(n, caseAt(n), today, LAUNCH_UTC) : notFound();
+      }
+    }
+    const res = await env.ASSETS.fetch(request);
+    return res.status === 404 && request.method === 'GET' && !url.pathname.startsWith('/api') ? notFound() : res;
   },
 };
 
