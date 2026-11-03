@@ -113,8 +113,8 @@ async function handleApi(request, url) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    // www -> bare domain
-    if (url.hostname === 'www.threemovesago.com') {
+    // www and the old workers.dev address -> bare domain
+    if (url.hostname === 'www.threemovesago.com' || url.hostname.endsWith('.workers.dev')) {
       url.hostname = 'threemovesago.com';
       return Response.redirect(url.toString(), 301);
     }
