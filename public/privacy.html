@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy – Three Moves Ago</title>
+<meta name="description" content="How Three Moves Ago handles your data: no accounts, no ads, no tracking cookies.">
+<link rel="canonical" href="https://threemovesago.pacurartudorx.workers.dev/privacy">
+<meta name="theme-color" content="#2d6a4f">
+<meta property="og:title" content="Privacy · Three Moves Ago">
+<meta property="og:description" content="No accounts, no ads, no tracking cookies.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://threemovesago.pacurartudorx.workers.dev/privacy">
+<meta property="og:image" content="https://threemovesago.pacurartudorx.workers.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/fonts/schibsted-grotesk.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="/fonts/newsreader-italic-600.woff" as="font" type="font/woff" crossorigin>
+<style>
+@font-face{font-family:"Newsreader";src:url("/fonts/newsreader-italic-600.woff") format("woff");font-style:italic;font-weight:600;font-display:swap}
+@font-face{font-family:"Schibsted Grotesk";src:url("/fonts/schibsted-grotesk.woff") format("woff");font-style:normal;font-weight:400 700;font-display:swap}
+</style>
+<style>
+:root{--bg:#f7f7f2;--surface:#fff;--ink:#1b1d1a;--muted:#5f645c;--line:#dcded5;--accent:#2d6a4f;--on-accent:#fff;--accent-soft:#dcebe2;
+--font-display:"Newsreader",Georgia,serif;--font-ui:"Schibsted Grotesk",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121412;--surface:#1b1e1b;--ink:#e8eae3;--muted:#a0a69c;--line:#2f332e;--accent:#6bb58f;--on-accent:#0e1a13;--accent-soft:#1e3428}}
+:root[data-theme="dark"]{--bg:#121412;--surface:#1b1e1b;--ink:#e8eae3;--muted:#a0a69c;--line:#2f332e;--accent:#6bb58f;--on-accent:#0e1a13;--accent-soft:#1e3428}
+*{box-sizing:border-box}
+html{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:17px;line-height:1.6}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-style:italic;font-weight:600;font-size:21px;color:var(--ink);text-decoration:none;white-space:nowrap}
+.logo .ago{color:var(--accent)} .mark{width:28px;height:28px}
+.play{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:600;text-decoration:none;font-size:15px}
+main{padding:28px 0 56px}
+h1{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:clamp(30px,6vw,42px);line-height:1.12;letter-spacing:-.5px;margin:0 0 14px}
+h2{font-size:21px;margin:36px 0 8px;line-height:1.3}
+.lead{font-size:19px;color:var(--muted);margin:0 0 8px}
+ul,ol{padding-left:22px} li{margin:4px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:16px 0}
+.tile{display:inline-block;min-width:44px;text-align:center;padding:2px 8px;border-radius:5px;font-weight:600;font-size:14px;color:#fff;margin-right:6px}
+.g{background:#2d6a4f} .y{background:#c99a22} .x{background:#6f736c}
+details{border-bottom:1px solid var(--line);padding:10px 0} summary{cursor:pointer;font-weight:600} details p{margin:8px 0 2px;color:var(--muted)}
+.cta{margin-top:36px;text-align:center}
+a{color:var(--accent)}
+footer{border-top:1px solid var(--line);padding:18px 0 28px;color:var(--muted);font-size:14px;text-align:center}
+@media (max-width:380px){.logo{font-size:18px}.play{padding:0 12px}}
+table{width:100%;border-collapse:collapse;font-size:15px;margin:10px 0}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:600}
+code{font-size:14px;background:var(--surface);border:1px solid var(--line);padding:1px 6px;border-radius:4px;word-break:break-all}
+h2{font-size:19px;margin:28px 0 6px}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="logo" href="/"><svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="var(--accent)"/><g transform="translate(50,18) scale(.46)" fill="var(--on-accent)"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(27,27) scale(.4)" fill="var(--on-accent)" opacity=".55"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(6,35) scale(.35)" fill="var(--on-accent)" opacity=".28"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g></svg><span>Three Moves <span class="ago">Ago</span></span></a><a class="play" href="/">Play today</a></div></header>
+<main class="wrap">
+<h1>Privacy</h1>
+<p class="lead">Short version: no accounts, no ads, no tracking cookies. We keep only what the game needs.</p>
+
+<h2>Who is responsible</h2>
+<p>Three Moves Ago is run by <b>22 Summers</b>. Contact: <a href="mailto:mycampus.students@gmail.com">mycampus.students@gmail.com</a>.</p>
+
+<h2>What is stored on your device</h2>
+<p>The game saves your progress in your browser’s local storage, not in cookies: the cases you played, your attempts, your streak and stats, your sound and theme settings, and a random player ID. This data stays on your device. You can delete it at any time by clearing this site’s data in your browser.</p>
+
+<h2>What we store on our server</h2>
+<p>When you finish a case, we save one anonymous result so we can show how many players solved each case:</p>
+<table>
+<tr><th>Data</th><th>Why</th></tr>
+<tr><td>Case number</td><td>To count results per case</td></tr>
+<tr><td>Random player ID</td><td>So each player is counted once per case</td></tr>
+<tr><td>Solved or not, number of attempts</td><td>For the “players solved it” statistics</td></tr>
+<tr><td>Time of the result</td><td>For the statistics</td></tr>
+</table>
+<p>The player ID is a random number created in your browser. It is not linked to your name, email or account, and we do not ask for any of these. Results are stored with <b>Supabase</b>, in the EU (Frankfurt, Germany).</p>
+<p>Your player ID: <code id="pid">none yet</code>. If you want your results deleted, send us this ID by email.</p>
+
+<h2>Hosting</h2>
+<p>The site is hosted by <b>Cloudflare</b>. Like any web host, Cloudflare processes your IP address and basic request data to deliver the pages and protect the site from abuse. We do not use this data to identify or follow you.</p>
+
+<h2>What we don’t do</h2>
+<ul>
+<li>No advertising and no ad trackers.</li>
+<li>No analytics cookies and no fingerprinting.</li>
+<li>No selling or sharing of data.</li>
+<li>No third-party fonts or scripts: fonts are served from our own site.</li>
+</ul>
+
+<h2>Your rights</h2>
+<p>Under the GDPR you can ask to see or delete the data linked to your player ID, and you can complain to your data protection authority (in Romania, the ANSPDCP). Write to <a href="mailto:mycampus.students@gmail.com">mycampus.students@gmail.com</a>.</p>
+
+<p class="lead" style="font-size:15px;margin-top:28px">Last updated: 3 November 2026.</p>
+</main>
+<footer><div class="wrap"><a href="/">Play</a> · <a href="/about">FAQ</a> · Three Moves Ago</div></footer>
+<script>
+try { const id = JSON.parse(localStorage.getItem('tma:player') || 'null'); if (id) document.getElementById('pid').textContent = id; } catch (e) {}
+</script>
+</body>
+</html>
