@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What Is Retrograde Analysis? Daily Retro Chess Puzzle – Three Moves Ago</title>
+<meta name="description" content="Learn what retrograde analysis and proof games are in chess, and how to solve Three Moves Ago, a free daily retro chess puzzle where you work out the moves that led to a position.">
+<link rel="canonical" href="https://threemovesago.pacurartudorx.workers.dev/about">
+<meta name="theme-color" content="#2d6a4f">
+<meta property="og:title" content="What is retrograde analysis? · Three Moves Ago">
+<meta property="og:description" content="Retro chess explained: find the moves that led to the position. A free daily puzzle.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://threemovesago.pacurartudorx.workers.dev/about">
+<meta property="og:image" content="https://threemovesago.pacurartudorx.workers.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@1,6..72,600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is Three Moves Ago?", "acceptedAnswer": {"@type": "Answer", "text": "A free daily chess puzzle. You see a final position and must find the three moves by White and the three moves by Black that led to it. You have five attempts, and every case has exactly one solution."}}, {"@type": "Question", "name": "What is retrograde analysis in chess?", "acceptedAnswer": {"@type": "Answer", "text": "Retrograde analysis (often shortened to retro analysis) means working backwards from a chess position to deduce what happened earlier in the game: which moves were played, which pieces were captured and in what order. Three Moves Ago is a daily retro puzzle."}}, {"@type": "Question", "name": "What is a proof game?", "acceptedAnswer": {"@type": "Answer", "text": "A proof game is a type of retro chess problem: you are given a position and a number of moves, and you must find the game that reaches that position in exactly that many moves. Every Three Moves Ago case is a short proof game of three moves for each side."}}, {"@type": "Question", "name": "Do the moves have to be good chess moves?", "acceptedAnswer": {"@type": "Answer", "text": "No. The moves only have to be legal and lead to the exact target position. Pieces may move and come back, and captures may look strange. The final position is the proof."}}, {"@type": "Question", "name": "When does a new case come out?", "acceptedAnswer": {"@type": "Answer", "text": "A new case is released every day at 07:00 Romania time, at the same moment for every player. Past cases stay playable in the archive."}}, {"@type": "Question", "name": "Is it like Wordle?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, it works in a similar way: one puzzle a day, a few attempts, and coloured feedback. Green means the right move at the right turn, yellow means a move from the solution played at the wrong turn, and grey means the move is not in the solution."}}]}</script>
+<style>
+:root{--bg:#f7f7f2;--surface:#fff;--ink:#1b1d1a;--muted:#5f645c;--line:#dcded5;--accent:#2d6a4f;--on-accent:#fff;--accent-soft:#dcebe2;
+--font-display:"Newsreader",Georgia,serif;--font-ui:"Schibsted Grotesk",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121412;--surface:#1b1e1b;--ink:#e8eae3;--muted:#a0a69c;--line:#2f332e;--accent:#6bb58f;--on-accent:#0e1a13;--accent-soft:#1e3428}}
+:root[data-theme="dark"]{--bg:#121412;--surface:#1b1e1b;--ink:#e8eae3;--muted:#a0a69c;--line:#2f332e;--accent:#6bb58f;--on-accent:#0e1a13;--accent-soft:#1e3428}
+*{box-sizing:border-box}
+html{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:17px;line-height:1.6}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-style:italic;font-weight:600;font-size:21px;color:var(--ink);text-decoration:none;white-space:nowrap}
+.logo .ago{color:var(--accent)} .mark{width:28px;height:28px}
+.play{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:600;text-decoration:none;font-size:15px}
+main{padding:28px 0 56px}
+h1{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:clamp(30px,6vw,42px);line-height:1.12;letter-spacing:-.5px;margin:0 0 14px}
+h2{font-size:21px;margin:36px 0 8px;line-height:1.3}
+.lead{font-size:19px;color:var(--muted);margin:0 0 8px}
+ul,ol{padding-left:22px} li{margin:4px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:16px 0}
+.tile{display:inline-block;min-width:44px;text-align:center;padding:2px 8px;border-radius:5px;font-weight:600;font-size:14px;color:#fff;margin-right:6px}
+.g{background:#2d6a4f} .y{background:#c99a22} .x{background:#6f736c}
+details{border-bottom:1px solid var(--line);padding:10px 0} summary{cursor:pointer;font-weight:600} details p{margin:8px 0 2px;color:var(--muted)}
+.cta{margin-top:36px;text-align:center}
+a{color:var(--accent)}
+footer{border-top:1px solid var(--line);padding:18px 0 28px;color:var(--muted);font-size:14px;text-align:center}
+@media (max-width:380px){.logo{font-size:18px}.play{padding:0 12px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="logo" href="/"><svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="var(--accent)"/><g transform="translate(50,18) scale(.46)" fill="var(--on-accent)"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(27,27) scale(.4)" fill="var(--on-accent)" opacity=".55"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(6,35) scale(.35)" fill="var(--on-accent)" opacity=".28"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g></svg><span>Three Moves <span class="ago">Ago</span></span></a><a class="play" href="/">Play today</a></div></header>
+<main class="wrap">
+<h1>A daily chess puzzle in retrograde analysis</h1>
+<p class="lead">You see a position. Something happened on the board. Your job is to work out exactly how it got there.</p>
+
+<h2>What is Three Moves Ago?</h2>
+<p>Three Moves Ago is a free daily chess puzzle. Every day you get a <b>target position</b> and a starting position. You must find the <b>three moves by White and three moves by Black</b> that turn one into the other. You have five attempts, and each case has exactly one solution.</p>
+<p>Cases marked <b>Normal</b> start from the usual opening position. <b>Extreme · Midgame</b> cases start from a real middlegame, after openings like the Italian, the Ruy Lopez, the London or the Sicilian Dragon, so there are many more pieces to keep track of.</p>
+
+<h2>What is retrograde analysis?</h2>
+<p><b>Retrograde analysis</b>, or <b>retro analysis</b>, is the art of reasoning backwards in chess. Instead of asking “what is the best move now?”, you ask “what must have happened before?”. Which pieces were captured, and by whom? Why is that pawn on that file? Could that bishop really have got out?</p>
+<p>It is a classic genre of chess problems, made famous for a wider audience by Raymond Smullyan’s book <i>The Chess Mysteries of Sherlock Holmes</i>, where every position is a little crime scene. Three Moves Ago is built on the same idea: you are the detective.</p>
+
+<h2>What is a proof game?</h2>
+<p>A <b>proof game</b> is a retro problem where you are given a position and a number of moves, and you must find the game that reaches that position in exactly that many moves. Every case here is a short proof game: three moves for each side, no more and no fewer.</p>
+
+<h2>How to play</h2>
+<ol>
+<li>Look at the target position (tap it to enlarge).</li>
+<li>Play the moves on the big board, starting with White: tap a piece, then tap where it goes.</li>
+<li>After six moves the game checks your answer and colours each move:</li>
+</ol>
+<div class="card">
+<p style="margin:0 0 6px"><span class="tile g">e4</span>Right move, right turn.</p>
+<p style="margin:0 0 6px"><span class="tile y">Nf3</span>A move from the solution, but at the wrong turn.</p>
+<p style="margin:0"><span class="tile x">a3</span>Not part of the solution.</p>
+</div>
+<p>You get five attempts and one hint. Solve today’s case to keep your streak going.</p>
+
+<h2>Tips for solving retro chess puzzles</h2>
+<ul>
+<li><b>Count the pieces.</b> A missing piece was captured. Find out which piece could have taken it, and when.</li>
+<li><b>Read the pawns.</b> A pawn on a different file than where it started must have captured something on the way.</li>
+<li><b>Moves don’t have to be good.</b> They only have to be legal and lead to this exact position.</li>
+<li><b>Pieces can come back.</b> A piece on its home square may still have moved out, captured something, and returned.</li>
+<li><b>Checks force the order.</b> If a king has moved, ask what forced it. A check often explains a strange sequence.</li>
+</ul>
+
+<h2>Frequently asked questions</h2>
+<details><summary>What is Three Moves Ago?</summary><p>A free daily chess puzzle. You see a final position and must find the three moves by White and the three moves by Black that led to it. You have five attempts, and every case has exactly one solution.</p></details><details><summary>What is retrograde analysis in chess?</summary><p>Retrograde analysis (often shortened to retro analysis) means working backwards from a chess position to deduce what happened earlier in the game: which moves were played, which pieces were captured and in what order. Three Moves Ago is a daily retro puzzle.</p></details><details><summary>What is a proof game?</summary><p>A proof game is a type of retro chess problem: you are given a position and a number of moves, and you must find the game that reaches that position in exactly that many moves. Every Three Moves Ago case is a short proof game of three moves for each side.</p></details><details><summary>Do the moves have to be good chess moves?</summary><p>No. The moves only have to be legal and lead to the exact target position. Pieces may move and come back, and captures may look strange. The final position is the proof.</p></details><details><summary>When does a new case come out?</summary><p>A new case is released every day at 07:00 Romania time, at the same moment for every player. Past cases stay playable in the archive.</p></details><details><summary>Is it like Wordle?</summary><p>Yes, it works in a similar way: one puzzle a day, a few attempts, and coloured feedback. Green means the right move at the right turn, yellow means a move from the solution played at the wrong turn, and grey means the move is not in the solution.</p></details>
+
+<div class="cta"><a class="play" href="/">Play today’s case</a></div>
+</main>
+<footer><div class="wrap">Three Moves Ago · a daily retro chess puzzle</div></footer>
+</body>
+</html>

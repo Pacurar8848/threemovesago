@@ -3,14 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="A daily chess detective puzzle. See the position, work out the three moves that led there.">
-<meta property="og:title" content="Three Moves Ago">
+<meta name="description" content="A free daily chess puzzle in retrograde analysis. See the final position and work out the three moves each side played to reach it. Like Wordle, but for chess proof games.">
+<link rel="canonical" href="https://threemovesago.pacurartudorx.workers.dev/">
+<meta name="theme-color" content="#2d6a4f">
+<meta property="og:title" content="Three Moves Ago – Daily Retro Chess Puzzle">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://threemovesago.pacurartudorx.workers.dev/">
 <meta property="og:description" content="A daily chess detective puzzle. Work out the three moves that led to today's position.">
 <link rel="icon" type="image/svg+xml" href="/icon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:image" content="https://threemovesago.pacurartudorx.workers.dev/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<title>Three Moves Ago</title>
+<title>Three Moves Ago – Daily Retro Chess Puzzle: Guess the Moves</title>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "name": "Three Moves Ago", "url": "https://threemovesago.pacurartudorx.workers.dev/"}, {"@type": ["VideoGame", "WebApplication"], "name": "Three Moves Ago", "url": "https://threemovesago.pacurartudorx.workers.dev/", "applicationCategory": "GameApplication", "genre": ["Puzzle", "Chess", "Retrograde analysis"], "gamePlatform": "Web browser", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": "A free daily chess puzzle in retrograde analysis. See the final position and work out the three moves each side played to reach it. Like Wordle, but for chess proof games.", "image": "https://threemovesago.pacurartudorx.workers.dev/og.png", "inLanguage": "en"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@1,6..72,600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
 <style>
@@ -109,6 +114,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
 .stats b{display:block;font-size:24px;font-variant-numeric:tabular-nums}
 .stats span{font-size:12px;color:var(--muted)}
 .foot{font-size:13px;color:var(--muted)}
+.site-foot{text-align:center;margin-top:8px}.site-foot a{color:var(--muted);text-underline-offset:3px}
 .overlay{position:fixed;inset:0;background:rgba(10,12,10,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20;padding:0 max(0px,env(safe-area-inset-right,0px)) 0 max(0px,env(safe-area-inset-left,0px))}
 .sheet{width:100%;max-width:480px;max-height:88%;overflow:auto;background:var(--bg);border-radius:14px 14px 0 0;padding:20px max(18px,env(safe-area-inset-left,0px)) calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
 @media (min-width:600px){.overlay{align-items:center}.sheet{border-radius:14px}}
@@ -211,6 +217,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
     <textarea class="share-fallback" id="shareText" readonly hidden aria-label="Result to copy"></textarea>
     <div class="foot" id="nextCase">Next case in --:--:--</div>
   </section>
+  <p class="foot site-foot"><a href="/about">About · What is retrograde analysis?</a></p>
 </main>
 
 <div class="overlay" id="helpOv" hidden>
