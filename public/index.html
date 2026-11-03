@@ -123,6 +123,12 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
 .bar{height:20px;min-width:22px;border-radius:4px;background:var(--absent);color:var(--on-absent);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
 .bar.now{background:var(--accent);color:var(--on-accent)}
 .archive-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 14px;border-radius:8px;background:var(--accent-soft);font-size:14px;font-weight:500}
+.sound-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;margin:4px 0 10px;border-top:1px solid var(--line);font-weight:500}
+.switch{position:relative;width:46px;height:28px;border-radius:14px;border:0;background:var(--line);cursor:pointer;transition:background .15s}
+.switch span{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.switch[aria-checked="true"]{background:var(--accent)}
+.switch[aria-checked="true"] span{transform:translateX(18px)}
+@media (prefers-reduced-motion:reduce){.switch,.switch span{transition:none}}
 .link-btn{border:0;background:none;color:var(--accent);font-weight:600;cursor:pointer;min-height:36px;padding:0 8px;border-radius:6px}
 .arch{display:flex;flex-direction:column;gap:6px}
 .arch-item{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);text-align:left;cursor:pointer;width:100%}
@@ -218,6 +224,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
       <div><span class="tile y">Nf3</span><span>Right move, wrong turn.</span></div>
       <div><span class="tile x">a3</span><span>Not in the solution.</span></div>
     </div>
+    <div class="sound-row"><span>Sounds</span><button class="switch" id="soundBtn" role="switch" aria-checked="true" aria-label="Sounds"><span></span></button></div>
     <button class="btn pri" data-close>OK</button>
   </div>
 </div>
@@ -511,6 +518,49 @@ function renderResult() {
 }
 function msg(t) { $('msg').innerHTML = t; }
 
+// Sounds: synthesized with Web Audio (no files to download).
+const SND = (() => {
+  let ctx = null, noise = null, on = store.get('tma:sound', true);
+  function ac() {
+    if (!on) return null;
+    try {
+      if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); }
+      if (ctx.state === 'suspended') ctx.resume();
+      if (!noise) { noise = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate); const d = noise.getChannelData(0); for (let k = 0; k < d.length; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / d.length, 3); }
+      return ctx;
+    } catch (e) { return null; }
+  }
+  function knock(c, t, vol, band, low) {
+    const src = c.createBufferSource(); src.buffer = noise;
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = band; bp.Q.value = 1.4;
+    const g = c.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+    src.connect(bp).connect(g).connect(c.destination); src.start(t); src.stop(t + 0.12);
+    const o = c.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(low, t); o.frequency.exponentialRampToValueAtTime(low / 2, t + 0.08);
+    const og = c.createGain(); og.gain.setValueAtTime(vol * 0.7, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    o.connect(og).connect(c.destination); o.start(t); o.stop(t + 0.12);
+  }
+  function tone(c, t, f, dur, vol, type = 'triangle', f2) {
+    const o = c.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + 0.02);
+  }
+  function play(kind) {
+    const c = ac(); if (!c) return; const t = c.currentTime + 0.005;
+    if (kind === 'move') knock(c, t, 0.55, 1700, 190);
+    else if (kind === 'capture') { knock(c, t, 0.7, 1300, 160); knock(c, t + 0.05, 0.5, 2100, 220); }
+    else if (kind === 'check') { knock(c, t, 0.6, 1700, 190); tone(c, t + 0.04, 880, 0.18, 0.08, 'sine'); }
+    else if (kind === 'select') knock(c, t, 0.12, 2600, 300);
+    else if (kind === 'undo') knock(c, t, 0.3, 1200, 140);
+    else if (kind === 'bad') { tone(c, t, 330, 0.16, 0.09); tone(c, t + 0.13, 247, 0.24, 0.09); }
+    else if (kind === 'win') [523, 659, 784, 1047].forEach((f, k) => tone(c, t + k * 0.09, f, k === 3 ? 0.45 : 0.18, 0.1));
+    else if (kind === 'lose') { tone(c, t, 294, 0.22, 0.1); tone(c, t + 0.18, 262, 0.22, 0.1); tone(c, t + 0.36, 196, 0.5, 0.1); }
+  }
+  return { play, get on() { return on; }, set(v) { on = v; store.set('tma:sound', v); } };
+})();
+function syncSoundBtn() { $('soundBtn').setAttribute('aria-checked', String(SND.on)); }
+$('soundBtn').onclick = () => { SND.set(!SND.on); syncSoundBtn(); SND.play('move'); };
+syncSoundBtn();
+
 function onSquare(i) {
   if (S.status !== 'playing' || S.plies.length >= S.n) return;
   const w = S.plies.length % 2 === 0;
@@ -519,12 +569,13 @@ function onSquare(i) {
     const m = legalMoves(S.board, w).find(m => m[0] === S.sel && m[1] === i);
     if (m) { play(m, w); return; }
   }
-  if (p !== '.' && isW(p) === w) { S.sel = S.sel === i ? null : i; }
+  if (p !== '.' && isW(p) === w) { S.sel = S.sel === i ? null : i; if (S.sel != null) SND.play('select'); }
   else { S.sel = null; if (p !== '.') msg(`It is ${w ? 'White' : 'Black'}'s turn.`); }
   renderBoard();
 }
 function play([i, j, nb], w) {
   const s = san(S.board, i, j, nb, w);
+  SND.play(/[+#]/.test(s) ? 'check' : s.includes('x') ? 'capture' : 'move');
   S.plies.push({ uci: sqName(i) + sqName(j), san: s, prev: S.board });
   S.board = nb; S.sel = null;
   if (S.plies.length === S.n) { renderBoard(); renderRows(); setTimeout(evaluate, 250); }
@@ -534,9 +585,10 @@ function evaluate() {
   const marks = S.plies.map((p, k) => p.uci === S.sol[k] ? 'g' : (S.sol.some((u, m) => u === p.uci && m % 2 === k % 2) ? 'y' : 'x'));
   S.attempts.push({ plies: S.plies.map(p => ({ uci: p.uci, san: p.san })), marks });
   const solved = S.board === S.target;
-  if (solved) { S.status = 'won'; recordResult(true); setTimeout(submitResult, 0); msg('<b>Case closed.</b> That is exactly how the game went.'); }
-  else if (S.attempts.length >= MAX) { S.status = 'lost'; recordResult(false); setTimeout(submitResult, 0); msg('Out of attempts. The solution is below.'); }
+  if (solved) { SND.play('win'); S.status = 'won'; recordResult(true); setTimeout(submitResult, 0); msg('<b>Case closed.</b> That is exactly how the game went.'); }
+  else if (S.attempts.length >= MAX) { SND.play('lose'); S.status = 'lost'; recordResult(false); setTimeout(submitResult, 0); msg('Out of attempts. The solution is below.'); }
   else {
+    SND.play('bad');
     const g = marks.filter(m => m === 'g').length;
     msg(`<b>Not the target position.</b> ${g} of ${S.n} moves are right. Try again from the start.`);
     S.board = S.start; S.plies = [];
@@ -545,7 +597,7 @@ function evaluate() {
 }
 
 $('board').addEventListener('click', e => { const b = e.target.closest('.sq'); if (b) onSquare(+b.dataset.i); });
-$('undoBtn').onclick = () => { const p = S.plies.pop(); if (p) { S.board = p.prev; S.sel = null; msg(`${S.plies.length % 2 === 0 ? 'White' : 'Black'} to move.`); render(); } };
+$('undoBtn').onclick = () => { const p = S.plies.pop(); if (p) { SND.play('undo'); S.board = p.prev; S.sel = null; msg(`${S.plies.length % 2 === 0 ? 'White' : 'Black'} to move.`); render(); } };
 $('resetBtn').onclick = () => { S.board = S.start; S.plies = []; S.sel = null; msg('Board reset. White to move.'); render(); };
 $('hintBtn').onclick = () => {
   const lastMarks = S.attempts.length ? S.attempts[S.attempts.length - 1].marks : [];
