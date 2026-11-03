@@ -116,6 +116,9 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
 .arch-item:hover{border-color:var(--muted)}
 .arch-item .t{display:flex;flex-direction:column;line-height:1.3}
 .arch-item .t small{color:var(--muted);font-size:13px}
+.arch-item .crowd{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.crowd-line{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.crowd-line b{color:var(--ink)}
 .chip{flex:0 0 auto;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-variant-numeric:tabular-nums}
 .chip.won{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .chip.lost{background:var(--absent);border-color:var(--absent);color:var(--on-absent)}
@@ -179,6 +182,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
       <div class="lbl">Solution</div>
       <div class="sol" id="solText"></div>
     </div>
+    <div class="crowd-line" id="crowd" hidden></div>
     <div class="stats" id="statsRow"></div>
     <div class="actions">
       <button class="btn pri" id="shareBtn">Share result</button>
@@ -326,10 +330,53 @@ function newState(caseNo) {
   const st = { caseNo, archive: caseNo !== TODAY, target: fenToBoard(c.fen), sol: c.uci, solSan: c.san, level: c.level,
     n: c.uci.length, start: c.start ? fenToBoard(c.start) : START, mid: !!c.start, board: c.start ? fenToBoard(c.start) : START, plies: [], attempts: [], hint: null, status: 'playing', sel: null };
   const saved = store.get('tma:case:' + caseNo, null);
-  if (saved) { st.attempts = saved.attempts || []; st.hint = saved.hint ?? null; st.status = saved.status || 'playing'; }
+  if (saved) { st.attempts = saved.attempts || []; st.hint = saved.hint ?? null; st.status = saved.status || 'playing'; st.sent = !!saved.sent; }
   return st;
 }
-function saveCase() { store.set('tma:case:' + S.caseNo, { attempts: S.attempts, hint: S.hint, status: S.status }); }
+function saveCase() { store.set('tma:case:' + S.caseNo, { attempts: S.attempts, hint: S.hint, status: S.status, sent: !!S.sent }); }
+
+// Shared player counts (Supabase). Fails quietly when offline.
+const API = 'https://nnzwexsuyozeorabowwk.supabase.co/rest/v1/rpc/';
+const API_KEY = 'sb_publishable_fdwySncJRAI1iiIjdkzz4g_Gr8mmXu2';
+const CROWD = {};
+function playerId() {
+  let id = store.get('tma:player', null);
+  if (!id) {
+    id = (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => (Math.random() * 16 | 0).toString(16)));
+    store.set('tma:player', id);
+  }
+  return id;
+}
+async function rpc(fn, body) {
+  const r = await fetch(API + fn, { method: 'POST', headers: { apikey: API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(fn + ' ' + r.status);
+  const txt = await r.text(); return txt ? JSON.parse(txt) : null;
+}
+async function loadCrowd(from, to) {
+  try {
+    const rows = await rpc('case_stats', { p_from: from, p_to: to });
+    for (let n = from; n <= to; n++) CROWD[n] = { players: 0, solved: 0 };
+    for (const r of rows) CROWD[r.case_no] = { players: +r.players, solved: +r.solved };
+    return true;
+  } catch (e) { return false; }
+}
+async function submitResult() {
+  if (S.sent || S.status === 'playing') return;
+  const s = S;
+  try {
+    await rpc('submit_result', { p_case: s.caseNo, p_player: playerId(), p_won: s.status === 'won', p_attempts: s.attempts.length });
+    s.sent = true; if (s === S) saveCase(); else store.set('tma:case:' + s.caseNo, { attempts: s.attempts, hint: s.hint, status: s.status, sent: true });
+  } catch (e) {}
+  if (await loadCrowd(s.caseNo, s.caseNo) && s === S) renderCrowd();
+}
+function fmt(n) { return n.toLocaleString('en-US'); }
+function renderCrowd() {
+  const c = CROWD[S.caseNo], el = $('crowd');
+  if (!c || !c.players || S.status === 'playing') { el.hidden = true; return; }
+  const pct = Math.round(c.solved / c.players * 100);
+  el.innerHTML = `<b>${fmt(c.solved)}</b> of ${fmt(c.players)} player${c.players === 1 ? '' : 's'} solved this case (${pct}%).`;
+  el.hidden = false;
+}
 function caseDate(n) { const d = new Date(LAUNCH); d.setDate(d.getDate() + n - 1); return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); }
 function isLocked(n) { return ARCHIVE_PAYWALL && n < TODAY - FREE_RECENT; }
 function stats() { return store.get('tma:stats', { played: 0, won: 0, streak: 0, best: 0, lastWon: 0, dist: [0, 0, 0, 0, 0] }); }
@@ -426,6 +473,7 @@ function renderResult() {
   $('resTitle').textContent = won ? `Solved in ${S.attempts.length} attempt${S.attempts.length > 1 ? 's' : ''}` : 'The case went cold';
   $('solText').textContent = pairs(S.solSan);
   $('statsRow').innerHTML = statCells(stats());
+  renderCrowd();
   $('shareBtn').hidden = S.archive;
   $('nextCase').hidden = S.archive;
 }
@@ -454,8 +502,8 @@ function evaluate() {
   const marks = S.plies.map((p, k) => p.uci === S.sol[k] ? 'g' : (S.sol.some((u, m) => u === p.uci && m % 2 === k % 2) ? 'y' : 'x'));
   S.attempts.push({ plies: S.plies.map(p => ({ uci: p.uci, san: p.san })), marks });
   const solved = S.board === S.target;
-  if (solved) { S.status = 'won'; recordResult(true); msg('<b>Case closed.</b> That is exactly how the game went.'); }
-  else if (S.attempts.length >= MAX) { S.status = 'lost'; recordResult(false); msg('Out of attempts. The solution is below.'); }
+  if (solved) { S.status = 'won'; recordResult(true); setTimeout(submitResult, 0); msg('<b>Case closed.</b> That is exactly how the game went.'); }
+  else if (S.attempts.length >= MAX) { S.status = 'lost'; recordResult(false); setTimeout(submitResult, 0); msg('Out of attempts. The solution is below.'); }
   else {
     const g = marks.filter(m => m === 'g').length;
     msg(`<b>Not the target position.</b> ${g} of ${S.n} moves are right. Try again from the start.`);
@@ -482,7 +530,7 @@ $('shareBtn').onclick = async () => {
   catch (e) { ta.hidden = false; ta.value = text; ta.focus(); ta.select(); $('shareBtn').textContent = 'Copy the text below'; }
 };
 function openCase(n) {
-  S = newState(n); $('shareText').hidden = true;
+  S = newState(n); if (S.status !== 'playing') { submitResult(); } $('shareText').hidden = true;
   msg(S.status === 'playing' ? (S.archive ? 'Archive case. It does not change your streak.' : 'Tap a piece, then tap where it goes.') : 'This case is finished.');
   render(); window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -496,7 +544,7 @@ function renderArchive() {
     else if (sv && sv.status === 'won') chip = `<span class="chip won">Solved ${sv.attempts.length}/5</span>`;
     else if (sv && sv.status === 'lost') chip = '<span class="chip lost">Unsolved</span>';
     else if (sv && sv.attempts && sv.attempts.length) chip = `<span class="chip">${sv.attempts.length}/5 tried</span>`;
-    h += `<button class="arch-item" data-n="${n}"><span class="t"><b>Case #${n}${n === TODAY ? ' · Today' : ''}</b><small>${caseDate(n)} · ${c.level}</small></span>${chip}</button>`;
+    h += `<button class="arch-item" data-n="${n}"><span class="t"><b>Case #${n}${n === TODAY ? ' · Today' : ''}</b><small>${caseDate(n)} · ${c.level}</small>${CROWD[n] && CROWD[n].players ? `<span class="crowd">${fmt(CROWD[n].solved)} of ${fmt(CROWD[n].players)} solved</span>` : ''}</span>${chip}</button>`;
   }
   $('archList').innerHTML = h;
   $('archiveNote').textContent = ARCHIVE_PAYWALL ? `The last ${FREE_RECENT} cases are free. Older cases need an Archive Pass.` : 'Every past case. Free while the site is in beta.';
@@ -507,8 +555,9 @@ $('archList').addEventListener('click', e => {
   if (isLocked(n)) { $('archiveNote').textContent = 'The Archive Pass is coming soon.'; return; }
   $('archiveOv').hidden = true; openCase(n);
 });
-$('archiveBtn').onclick = () => { renderArchive(); openOv('archiveOv'); };
-$('practiceBtn').onclick = () => { renderArchive(); openOv('archiveOv'); };
+function openArchive() { renderArchive(); openOv('archiveOv'); loadCrowd(1, TODAY).then(ok => { if (ok && !$('archiveOv').hidden) renderArchive(); }); }
+$('archiveBtn').onclick = openArchive;
+$('practiceBtn').onclick = openArchive;
 $('todayBtn').onclick = () => openCase(TODAY);
 function effectiveDark() { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; }
 function syncThemeBtn() { const d = effectiveDark(); $('moon').toggleAttribute('hidden', d); $('sun').toggleAttribute('hidden', !d); $('themeBtn').setAttribute('aria-label', d ? 'Switch to light mode' : 'Switch to dark mode'); }
@@ -528,6 +577,7 @@ function tick() {
   $('nextCase').textContent = `Next case in ${pad(Math.floor(s / 3600))}:${pad(Math.floor(s % 3600 / 60))}:${pad(s % 60)}`;
 }
 S = newState(TODAY); render(); tick(); setInterval(tick, 1000);
+if (S.status !== 'playing') submitResult();
 if (S.status !== 'playing') msg(S.status === 'won' ? '<b>Case closed.</b> Come back tomorrow, or play the archive.' : 'Today\'s case is over. A new one arrives at midnight.');
 openOv('helpOv');
 </script>
