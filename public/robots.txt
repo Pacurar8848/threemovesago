@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://threemovesago.pacurartudorx.workers.dev/sitemap.xml
+Sitemap: https://threemovesago.com/sitemap.xml

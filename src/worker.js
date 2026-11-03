@@ -113,6 +113,11 @@ async function handleApi(request, url) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // www -> bare domain
+    if (url.hostname === 'www.threemovesago.com') {
+      url.hostname = 'threemovesago.com';
+      return Response.redirect(url.toString(), 301);
+    }
     if (url.pathname === '/api' || url.pathname.startsWith('/api/')) {
       try { return await handleApi(request, url); }
       catch (e) { return bad('Server error.', 500); }

@@ -2,6 +2,10 @@
   "name": "threemovesago",
   "main": "src/worker.js",
   "compatibility_date": "2025-10-01",
+  "routes": [
+    { "pattern": "threemovesago.com", "custom_domain": true },
+    { "pattern": "www.threemovesago.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
