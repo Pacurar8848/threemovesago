@@ -1,7 +1,10 @@
 {
   "name": "threemovesago",
+  "main": "src/worker.js",
   "compatibility_date": "2025-10-01",
   "assets": {
-    "directory": "./public"
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
   }
 }
