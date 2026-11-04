@@ -94,7 +94,7 @@ async function handleApi(request, url) {
     const solved = final === fenToBoard(c.fen);
     const marks = moves.map((u, k) => u === sol[k] ? 'g' : (sol.some((v, m) => v === u && m % 2 === k % 2) ? 'y' : 'x'));
     const reveal = solved || attempt >= MAX_ATTEMPTS;
-    return json({ solved, marks, solution: reveal ? { uci: sol, san: c.san } : null });
+    return json({ solved, marks, solution: reveal ? { uci: sol, san: c.san } : null, famous: reveal && c.famous ? c.famous : null });
   }
 
   // One hint: the solution move at index k.

@@ -211,6 +211,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
     <div>
       <div class="lbl">Solution</div>
       <div class="sol" id="solText"></div>
+      <p class="foot" id="famousText" hidden style="margin:6px 0 0"></p>
     </div>
     <div class="crowd-line" id="crowd" hidden></div>
     <div class="stats" id="statsRow"></div>
@@ -230,7 +231,7 @@ main{display:flex;flex-direction:column;gap:16px;padding-block:18px 40px}
     <div class="sheet-top"><div class="help-brand"><svg class="mark big" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="var(--accent)"/><g transform="translate(50,18) scale(.46)" fill="var(--on-accent)"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(27,27) scale(.4)" fill="var(--on-accent)" opacity=".55"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g><g transform="translate(6,35) scale(.35)" fill="var(--on-accent)" opacity=".28"><circle cx="50" cy="27" r="13"/><path d="M41 40h18l-3 6h-12z"/><path d="M38 80c2-14 6-26 12-32c6 6 10 18 12 32z"/><rect x="27" y="79" width="46" height="11" rx="4"/></g></svg><h2 id="helpTitle">How to play</h2></div><button class="icon-btn" data-close aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <p>You get a target position. Find the moves that led there: <b>3 moves by White and 3 by Black</b>, played from the position on the board. You have 5 attempts.</p>
     <p>Some cases start from the opening position. <b>Midgame cases</b> start from a position after a real opening, with White to move.</p>
-    <p class="foot">Opening cases are Normal, midgame cases are Extreme. A missing piece means it was captured. Moves don't have to be good — they just have to lead to this exact position. Expect pieces that move and come back, captures that leave no trace, and checks that force the order.</p>
+    <p class="foot">Opening cases are Normal, midgame cases are Extreme, and Famous game cases come from real historic games. A missing piece means it was captured. Moves don't have to be good — they just have to lead to this exact position. Expect pieces that move and come back, captures that leave no trace, and checks that force the order.</p>
     <div class="legend">
       <div><span class="tile g">e4</span><span>Right move, right turn.</span></div>
       <div><span class="tile y">Nf3</span><span>Right move, wrong turn.</span></div>
@@ -397,10 +398,10 @@ function newState(caseNo, c) {
     n: c.plies, start, mid: !!c.start, board: start, plies: [], attempts: [], hint: null, status: 'playing', sel: null, busy: false };
   const saved = store.get('tma:case:' + caseNo, null);
   if (saved) { st.attempts = saved.attempts || []; st.hint = saved.hint ?? null; st.status = saved.status || 'playing'; st.sent = !!saved.sent;
-    st.sol = saved.sol || null; st.solSan = saved.solSan || null; st.hintSan = saved.hintSan || null; }
+    st.sol = saved.sol || null; st.solSan = saved.solSan || null; st.hintSan = saved.hintSan || null; st.famous = saved.famous || null; }
   return st;
 }
-function saveCase() { store.set('tma:case:' + S.caseNo, { attempts: S.attempts, hint: S.hint, status: S.status, sent: !!S.sent, sol: S.sol, solSan: S.solSan, hintSan: S.hintSan }); }
+function saveCase() { store.set('tma:case:' + S.caseNo, { attempts: S.attempts, hint: S.hint, status: S.status, sent: !!S.sent, sol: S.sol, solSan: S.solSan, hintSan: S.hintSan, famous: S.famous || null }); }
 
 // Shared player counts (Supabase). Fails quietly when offline.
 const API = 'https://nnzwexsuyozeorabowwk.supabase.co/rest/v1/rpc/';
@@ -539,6 +540,7 @@ function renderResult() {
   $('resLabel').style.color = won ? 'var(--accent)' : 'var(--muted)';
   $('resTitle').textContent = won ? `Solved in ${S.attempts.length} attempt${S.attempts.length > 1 ? 's' : ''}` : 'The case went cold';
   $('solText').textContent = S.solSan ? pairs(S.solSan) : 'Loading the solution…';
+  $('famousText').hidden = !S.famous; $('famousText').textContent = S.famous ? '♟ ' + S.famous : '';
   $('statsRow').innerHTML = statCells(stats());
   renderCrowd();
   $('shareBtn').hidden = S.archive;
@@ -626,7 +628,7 @@ async function evaluate() {
   if (S !== st) return;
   const marks = res.marks;
   S.attempts.push({ plies: S.plies.map(p => ({ uci: p.uci, san: p.san })), marks });
-  if (res.solution) { S.sol = res.solution.uci; S.solSan = res.solution.san; }
+  if (res.solution) { S.sol = res.solution.uci; S.solSan = res.solution.san; S.famous = res.famous || null; }
   if (res.solved) { SND.play('win'); S.status = 'won'; recordResult(true); setTimeout(submitResult, 0); msg('<b>Case closed.</b> That is exactly how the game went.'); }
   else if (S.attempts.length >= MAX) { SND.play('lose'); S.status = 'lost'; recordResult(false); setTimeout(submitResult, 0); msg('Out of attempts. The solution is below.'); }
   else {
@@ -643,7 +645,7 @@ async function ensureSolution(st) {
   const last = st.attempts[st.attempts.length - 1];
   try {
     const res = await api('check', { n: st.caseNo, moves: last.plies.map(p => p.uci), attempt: st.status === 'lost' ? MAX : Math.min(st.attempts.length, MAX) });
-    if (res.solution) { st.sol = res.solution.uci; st.solSan = res.solution.san; if (S === st) { saveCase(); render(); } }
+    if (res.solution) { st.sol = res.solution.uci; st.solSan = res.solution.san; st.famous = res.famous || null; if (S === st) { saveCase(); render(); } }
   } catch (e) {}
 }
 
